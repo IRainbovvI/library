@@ -1,5 +1,3 @@
-// models/Book.js
-
 const mongoose = require('mongoose');
 
 const BookSchema = new mongoose.Schema({
@@ -13,8 +11,7 @@ const BookSchema = new mongoose.Schema({
   },
   imgSrc: {
     type: String,
-    default:
-      'https://www.nicepng.com/png/detail/103-1031917_book-cover-question-mark-image-book-with-question.png'
+    required: true
   },
   description: {
     type: String
@@ -31,4 +28,4 @@ const BookSchema = new mongoose.Schema({
   }
 });
 
-module.exports = Book = mongoose.model('book', BookSchema);
+module.exports = Book = mongoose.model('Book', BookSchema);

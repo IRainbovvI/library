@@ -1,42 +1,23 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
+import Cookies from 'js-cookie';
+import { useForm } from 'react-hook-form';
+import InputField from './InputField';
 
 import { useNavigate } from 'react-router-dom';
 
 const CreateBook = (props) => {
-  // Define the state with useState hook
   const navigate = useNavigate();
-  const [book, setBook] = useState({
-    title: '',
-    isbn: '',
-    author: '',
-    description: '',
-    published_date: '',
-    publisher: ''
-  });
+  const methods = useForm();
 
-  const onChange = (e) => {
-    setBook({ ...book, [e.target.name]: e.target.value });
-  };
-
-  const onSubmit = (e) => {
-    e.preventDefault();
-
+  const onSubmit = (f) => {
     axios
-      .post('http://localhost:8082/api/books', book)
+      .post('http://localhost:8082/api/books', f, {
+        headers: { Authorization: 'Bearer ' + Cookies.get('token') }
+      })
       .then((res) => {
-        setBook({
-          title: '',
-          isbn: '',
-          author: '',
-          description: '',
-          published_date: '',
-          publisher: ''
-        });
-
-        // Push to /
-        navigate('/');
+        navigate('/show-books');
       })
       .catch((err) => {
         console.log('Error in CreateBook!');
@@ -49,80 +30,92 @@ const CreateBook = (props) => {
         <div className='row'>
           <div className='col-md-8 m-auto'>
             <br />
-            <Link to='/' className='btn btn-outline-warning float-left'>
-              Show BooK List
+            <Link
+              to='/show-books'
+              className='btn btn-outline-warning float-left'
+            >
+              Show Book List
             </Link>
           </div>
           <div className='col-md-8 m-auto'>
             <h1 className='display-4 text-center'>Add Book</h1>
             <p className='lead text-center'>Create new book</p>
 
-            <form noValidate onSubmit={onSubmit}>
-              <div className='form-group'>
-                <input
-                  type='text'
-                  placeholder='Title of the Book'
-                  name='title'
-                  className='form-control'
-                  value={book.title}
-                  onChange={onChange}
-                />
-              </div>
+            <form
+              noValidate
+              onSubmit={methods.handleSubmit((f) => {
+                onSubmit(f);
+              })}
+            >
+              <InputField
+                methods={methods}
+                id='title'
+                type='text'
+                label='Title'
+                placeholder='Title'
+                validation={{
+                  required: 'Title is required.'
+                }}
+              />
               <br />
 
-              <div className='form-group'>
-                <input
-                  type='text'
-                  placeholder='ISBN'
-                  name='isbn'
-                  className='form-control'
-                  value={book.isbn}
-                  onChange={onChange}
-                />
-              </div>
+              <InputField
+                methods={methods}
+                id='imgSrc'
+                type='url'
+                label='Image'
+                placeholder='http://www.example.com/'
+                validation={{
+                  required: 'Image is required.',
+                  matchPattern: (v) =>
+                    /^(https?:\/\/)?([a-z0-9-]+\.)*[a-z0-9-]+(\.[a-z]{2,})(\/.*)*$/i.test(
+                      v
+                    ) || 'Field must be a valid url.'
+                }}
+              />
+              <br />
 
-              <div className='form-group'>
-                <input
-                  type='text'
-                  placeholder='Author'
-                  name='author'
-                  className='form-control'
-                  value={book.author}
-                  onChange={onChange}
-                />
-              </div>
+              <InputField
+                methods={methods}
+                id='author'
+                type='text'
+                label='Author'
+                placeholder='Author'
+                validation={{
+                  required: 'Author is required.'
+                }}
+              />
+              <br />
 
-              <div className='form-group'>
-                <input
-                  type='text'
-                  placeholder='Describe this book'
-                  name='description'
-                  className='form-control'
-                  value={book.description}
-                  onChange={onChange}
-                />
-              </div>
+              <InputField
+                methods={methods}
+                id='description'
+                type='text'
+                label='Description'
+                placeholder='Description'
+                validation={{}}
+              />
+              <br />
 
-              <div className='form-group'>
-                <input
-                  type='date'
-                  placeholder='published_date'
-                  name='published_date'
-                  className='form-control'
-                  value={book.published_date}
-                  onChange={onChange}
-                />
-              </div>
-              <div className='form-group'>
-                <input
-                  type='text'
-                  placeholder='Publisher of this Book'
-                  name='publisher'
-                  className='form-control'
-                  value={book.publisher}
-                  onChange={onChange}
-                />
-              </div>
+              <InputField
+                methods={methods}
+                id='published_date'
+                type='date'
+                label='Published Date'
+                placeholder='2000.01.01'
+                validation={{}}
+              />
+              <br />
+
+              <InputField
+                methods={methods}
+                id='publisher'
+                type='text'
+                label='Publisher'
+                placeholder='Publisher'
+                validation={{}}
+              />
+              <br />
 
               <input
                 type='submit'

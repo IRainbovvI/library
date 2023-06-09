@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import '../App.css';
 import axios from 'axios';
+import Cookies from 'js-cookie';
 
 function ShowBookDetails(props) {
   const [book, setBook] = useState({});
@@ -11,20 +12,38 @@ function ShowBookDetails(props) {
 
   useEffect(() => {
     axios
-      .get(`http://localhost:8082/api/books/${id}`)
+      .get(`http://localhost:8082/api/books/${id}`, {
+        headers: { Authorization: 'Bearer ' + Cookies.get('token') }
+      })
       .then((res) => {
-        setBook(res.data);
+        setBook({
+          ...res.data.book,
+          published_date:
+            res.data.book.published_date &&
+            parseDate(res.data.book.published_date)
+        });
       })
       .catch((err) => {
         console.log('Error from ShowBookDetails');
       });
   }, [id]);
 
+  const parseDate = (utcDate) => {
+    const date = new Date(utcDate);
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
+
+    return `${year}-${month}-${day}`;
+  };
+
   const onDeleteClick = (id) => {
     axios
-      .delete(`http://localhost:8082/api/books/${id}`)
+      .delete(`http://localhost:8082/api/books/${id}`, {
+        headers: { Authorization: 'Bearer ' + Cookies.get('token') }
+      })
       .then((res) => {
-        navigate('/');
+        navigate('/show-books');
       })
       .catch((err) => {
         console.log('Error form ShowBookDetails_deleteClick');
@@ -47,13 +66,13 @@ function ShowBookDetails(props) {
           </tr>
           <tr>
             <th scope='row'>3</th>
-            <td>ISBN</td>
-            <td>{book.isbn}</td>
+            <td>Image</td>
+            <td>{book.imgSrc}</td>
           </tr>
           <tr>
             <th scope='row'>4</th>
-            <td>Publisher</td>
-            <td>{book.publisher}</td>
+            <td>Description</td>
+            <td>{book.description}</td>
           </tr>
           <tr>
             <th scope='row'>5</th>
@@ -62,8 +81,8 @@ function ShowBookDetails(props) {
           </tr>
           <tr>
             <th scope='row'>6</th>
-            <td>Description</td>
-            <td>{book.description}</td>
+            <td>Publisher</td>
+            <td>{book.publisher}</td>
           </tr>
         </tbody>
       </table>
@@ -74,10 +93,25 @@ function ShowBookDetails(props) {
     <div className='ShowBookDetails'>
       <div className='container'>
         <div className='row'>
-          <div className='col-md-10 m-auto'>
-            <br /> <br />
-            <Link to='/' className='btn btn-outline-warning float-left'>
+          <div className='col-md-6 m-auto'>
+            <br />
+            <Link
+              to='/show-books'
+              className='btn btn-outline-warning float-left'
+            >
               Show Book List
+            </Link>
+          </div>
+          <div className='col-md-6 m-auto'>
+            <br />
+            <Link
+              to='/'
+              className='btn btn-outline-warning float-end'
+              onClick={() => {
+                Cookies.remove('token');
+              }}
+            >
+              Logout
             </Link>
           </div>
           <br />

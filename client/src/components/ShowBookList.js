@@ -3,13 +3,16 @@ import '../App.css';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import BookCard from './BookCard';
+import Cookies from 'js-cookie';
 
 function ShowBookList() {
   const [books, setBooks] = useState([]);
 
   useEffect(() => {
     axios
-      .get('http://localhost:8082/api/books')
+      .get('http://localhost:8082/api/books', {
+        headers: { Authorization: 'Bearer ' + Cookies.get('token') }
+      })
       .then((res) => {
         setBooks(res.data);
       })
@@ -20,7 +23,7 @@ function ShowBookList() {
 
   const bookList =
     books.length === 0
-      ? 'there is no book record!'
+      ? 'You have no books yet. Shame on you!'
       : books.map((book, k) => <BookCard book={book} key={k} />);
 
   return (
@@ -32,15 +35,29 @@ function ShowBookList() {
             <h2 className='display-4 text-center'>Books List</h2>
           </div>
 
-          <div className='col-md-11'>
-            <Link
-              to='/create-book'
-              className='btn btn-outline-warning float-right'
-            >
-              + Add New Book
-            </Link>
-            <br />
-            <br />
+          <div className='col-md-12'>
+            <div className='row'>
+              <div className='col-md-6'>
+                <Link
+                  to='/create-book'
+                  className='btn btn-outline-warning float-right'
+                >
+                  + Add New Book
+                </Link>
+              </div>
+              <div className='col-md-6 text-end'>
+                <Link
+                  to='/'
+                  className='btn btn-outline-warning float-right'
+                  onClick={() => {
+                    Cookies.remove('token');
+                  }}
+                >
+                  Logout
+                </Link>
+              </div>
+            </div>
+
             <hr />
           </div>
         </div>

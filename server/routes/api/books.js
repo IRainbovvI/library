@@ -1,16 +1,18 @@
 const middleware = require('../../middleware');
-const express = require('express');
-const router = express.Router();
 const Book = require('../../models/Book');
 const User = require('../../models/User');
+const express = require('express');
+const router = express.Router();
+
 const { checkSchema, validationResult } = require('express-validator');
 
 // @route GET api/books
 // @description Get all books
-// @access Public
+// @access Protected
 router.get('/', middleware.decodeJWT, async (req, res) => {
   try {
-    const user = await User.findById(req.UserId).populate('books');
+    const user = await User.findById(req.userId).populate('books');
+
     return res.json(user.books);
   } catch (e) {
     return res
@@ -21,7 +23,7 @@ router.get('/', middleware.decodeJWT, async (req, res) => {
 
 // @route GET api/books/:id
 // @description Get single book by id
-// @access Public
+// @access Protected
 router.get(
   '/:id',
   middleware.decodeJWT,
@@ -63,7 +65,7 @@ router.get(
 
 // @route Post api/books
 // @description add/save book
-// @access Public
+// @access Protected
 router.post(
   '/',
   middleware.decodeJWT,
@@ -82,7 +84,9 @@ router.post(
       isURL: {
         errorMessage: 'Invalid URL format.'
       },
-      optional: true
+      notEmpty: {
+        errorMessage: 'This field is required.'
+      }
     },
     description: {
       optional: true
@@ -123,7 +127,7 @@ router.post(
 
 // @route PUT api/books/:id
 // @description Update book
-// @access Public
+// @access Protected
 router.put(
   '/:id',
   middleware.decodeJWT,
@@ -139,7 +143,9 @@ router.put(
       }
     },
     imgSrc: {
-      optional: true,
+      notEmpty: {
+        errorMessage: 'This field is required.'
+      },
       isURL: {
         errorMessage: 'Invalid URL format.'
       }
@@ -190,7 +196,7 @@ router.put(
 
 // @route GET api/books/:id
 // @description Delete book by id
-// @access Public
+// @access Protected
 router.delete(
   '/:id',
   middleware.decodeJWT,

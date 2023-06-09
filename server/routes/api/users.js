@@ -6,7 +6,9 @@ const express = require('express');
 const { checkSchema, validationResult } = require('express-validator');
 const router = express.Router();
 
-// Handling post request
+// @route POST api/users/login
+// @description Log in as existing user
+// @access Public
 router.post(
   '/login',
   checkSchema({
@@ -76,7 +78,9 @@ router.post(
   }
 );
 
-// Handling post request
+// @route POST api/users/signup
+// @description Create new user
+// @access Public
 router.post(
   '/signup',
   checkSchema({

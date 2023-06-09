@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const Book = require('./Book');
+require('./Book');
 
 const UserSchema = new mongoose.Schema({
   name: {
@@ -17,4 +17,4 @@ const UserSchema = new mongoose.Schema({
   books: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Book' }]
 });
 
-module.exports = User = mongoose.model('user', UserSchema);
+module.exports = User = mongoose.model('User', UserSchema);
